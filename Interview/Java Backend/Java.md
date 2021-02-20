@@ -132,7 +132,12 @@ final方法，获得运行时类型
 3. 如果对象的equals方法被重写，那么对象的hashCode也尽量重写，并且产生hashCode使用的对象，一定要和equals方法中使用的一致，否则就会违反上面提到的第2点；
 4. 两个对象的hashCode相同，并不一定表示两个对象就相同，也就是不一定适用于equals(java.lang.Object)方法，只能够说明这两个对象在散列存储结构中，如Hashtable，他们“存放在同一个篮子里”。
 ### 10. 为什么重载hashCode方法？
-只有当类需要放在HashTable、HashMap、HashSet等等hash结构的集合时才会重载hashCode。如果是object对象，必须重载hashCode和equal方法。equals()相等的两个对象，hashcode()一定相等；equals（）不相等的两个对象，却并不能证明他们的hashcode()不相等。所以重载equals()重载时，hashCode()必须重载。  
+只有当类需要放在HashTable、HashMap、HashSet等等hash结构的集合时才会重载hashCode。如果是object对象，必须重载hashCode和equal方法。  
+equals()相等的两个对象，hashcode()一定相等；  
+equals()不相等的两个对象，却并不能证明他们的hashcode()不相等。  
+hashcode()不等，一定能推出equals()也不等；  
+hashcode()相等，equals()可能相等，也可能不等。  
+所以重载equals()重载时，hashCode()必须重载。  
 ### 11. ArrayList、LinkedList、Vector的区别
 1. 存储结构  
 ArrayList和Vector是基于动态数组实现的，LinkedList是基于双向链表实现的。三者都继承自List接口  
@@ -155,10 +160,91 @@ StringBuffer支持并发操作，线程安全的，适合多线程中使用。St
 当String的字符串拼接发生在初始化时`String str="1"+"2"+"hello";`，在jvm中实际上不产生拼接的过程，故速度最快。  
 在大多数实现中，StringBuilder > StringBuffer。  
 ### 13. Map、Set、List、Queue、Stack的特点与用法  
+- Map  
+键映射到值的对象。一个映射不能包含重复的键；每个键最多只能映射到一个值。  
+某些映射实现可明确保证其顺序，如 TreeMap 类；另一些映射实现则不保证顺序，如 HashMap 类。Map中元素，可以将key序列、value序列单独抽取出来。使用keySet()抽取key序列，将map中的所有keys生成一个Set。使用values()抽取value序列，将map中的所有values生成一个Collection。为什么一个生成Set，一个生成Collection？那是因为，key总是独一无二的，value允许重复。  
+Map 同样对每个元素保存一份，但这是基于 " 键 " 的， Map 也有内置的排序，因而不关心元素添加的顺序。如果添加元素的顺序对你很重要，应该使用 LinkedHashSet 或者 LinkedHashMap。  
+对于效率， Map 由于采用了哈希散列，查找元素时明显比 ArrayList 快。
 
-### 14. HashMap和HashTable的区别
-### 15. JDK7与JDK8中HashMap的实现
-### 16. HashMap和ConcurrentHashMap的区别，HashMap的底层源码
+- Set  
+一个不包含重复元素的 collection。不可随机访问包含的元素。只能用Iterator实现单向遍历。Set 没有同步方法。只关心某元素是否属于 Set。  
+- List  
+可随机访问包含的元素，元素是有序的，可在任意位置增、删元素，不管访问多少次，元素位置不变，允许重复元素，用Iterator实现单向遍历，也可用ListIterator实现双向遍历。关心的是顺序。  
+- Queue  
+先进先出  
+Queue使用时要尽量避免Collection的add()和remove()方法，而是要使用offer()来加入元素，使用poll()来获取并移出元素。它们的优点是通过返回值可以判断成功与否，add()和remove()方法在失败的时候会抛出异常。如果要使用前端而不移出该元素，使用element()或者peek()方法。值得注意的是LinkedList类实现了Queue接口，因此我们可以把LinkedList当成Queue来用。  
+Queue 实现通常不允许插入 null 元素，尽管某些实现（如 LinkedList）并不禁止插入 null。即使在允许 null 的实现中，也不应该将 null 插入到 Queue 中，因为 null 也用作 poll 方法的一个特殊返回值，表明队列不包含元素。  
+- Stack  
+后进先出  
+Stack继承自Vector（可增长的对象数组），也是同步的 
+它通过五个操作对类 Vector 进行了扩展 ，允许将向量视为堆栈。它提供了通常的 push 和 pop 操作，以及取堆栈顶点的 peek 方法、测试堆栈是否为空的 empty 方法、在堆栈中查找项并确定到堆栈顶距离的 search 方法。  
+- 总结  
+  - Collection 是对象集合， Collection 有两个子接口 List 和 Set  
+  - List 可以通过下标 (1,2..) 来取得值，值可以重复  
+  ArrayList ， Vector ， LinkedList 是 List 的实现类  
+ArrayList 是线程不安全的， Vector 是线程安全的，这两个类底层都是由数组实现的  
+LinkedList 是线程不安全的，底层是由链表实现的   
+  -  Set 只能通过游标来取值，并且值是不能重复的  
+  - Map 是键值对集合  
+HashTable 和 HashMap 是 Map 的实现类   
+HashTable 是线程安全的，不能存储 null 值   
+HashMap 不是线程安全的，可以存储 null 值  
+  - Stack类：继承自Vector，实现一个后进先出的栈。提供了几个基本方法，push、pop、peak、empty、search等。  
+  - Queue接口：提供了几个基本方法，offer、poll、peek等。已知实现类有LinkedList、PriorityQueue等。  
+### 14. HashMap和HashTable的区别  
+1. 父类  
+HashMap是继承自AbstractMap类，而HashTable是继承自Dictionary（已被废弃，详情看源代码）。不过它们都实现了同时实现了map、Cloneable（可复制）、Serializable（可序列化）这三个接口。  
+Hashtable比HashMap多提供了elments() 和contains() 两个方法。elments() 方法继承自Hashtable的父类Dictionnary。elements() 方法用于返回此Hashtable中的value的枚举。contains()方法判断该Hashtable是否包含传入的value。它的作用与containsValue()一致。事实上，contansValue() 就只是调用了一下contains() 方法。  
+2. null值问题  
+Hashtable既不支持Null key也不支持Null value。Hashtable的put()方法的注释中有说明。HashMap中，null可以作为键，但不可重复；可以有一个或多个键所对应的值为null。当get()方法返回null值时，可能是HashMap中没有该键，也可能使该键所对应的值为null。因此，在HashMap中不能由get()方法来判断HashMap中是否存在某个键， 而应该用containsKey()方法来判断。  
+3. 线程安全性  
+Hashtable是线程安全的，它的每个方法中都加入了Synchronize方法。在多线程并发的环境下，可以直接使用Hashtable，不需要自己为它的方法实现同步。  
+HashMap不是线程安全的，在多线程并发的环境下，可能会产生死锁等问题。  
+虽然HashMap不是线程安全的，但是它的效率会比Hashtable要好很多。这样设计是合理的。在我们的日常使用当中，大部分时间是单线程操作的。HashMap把这部分操作解放出来了。当需要多线程操作的时候可以使用线程安全的ConcurrentHashMap。ConcurrentHashMap虽然也是线程安全的，但是它的效率比Hashtable要高好多倍。因为ConcurrentHashMap使用了分段锁，并不对整个数据进行锁定。  
+4. 遍历方式不同  
+Hashtable、HashMap都使用了Iterator。而由于历史原因，Hashtable还使用了Enumeration的方式。  
+HashMap的Iterator是fail-fast迭代器。当有其它线程改变了HashMap的结构（增加，删除，修改元素），将会抛出ConcurrentModificationException。不过，通过Iterator的remove()方法移除元素则不会抛出ConcurrentModificationException异常。但这并不是一个一定发生的行为，要看JVM。  
+JDK8之前的版本中，Hashtable是没有fast-fail机制的。在JDK8及以后的版本中 ，Hashtable也是使用fast-fail的。  
+5. 扩容方式不同  
+Hashtable的初始长度是11，之后每次扩充容量变为之前的2n+1（n为上一次的长度）。  
+而HashMap的初始长度为16，之后每次扩充变为原来的两倍。  
+创建时，如果给定了容量初始值，那么Hashtable会直接使用你给定的大小，而HashMap会将其扩充为2的幂次方大小。  
+6. 添加元素时计算哈希值的方法不同  
+Hashtable直接使用对象的hashCode。  
+HashMap使用的是key的hashcode 高低16位异或的结果。效率更高。  
+[参考链接](https://www.cnblogs.com/javabg/p/7258550.html)
+### 15. JDK7与JDK8中HashMap的实现  
+1. 结构  
+JDK7中HashMap采用的是位桶+链表的方式，即我们常说的散列链表的方式，而JDK8中采用的是位桶+链表/红黑树。JDK8中，当同一个hash值的节点数不小于8时（且数组长度必须大于等于MIN_TREEIFY_CAPACITY（64），否则继续采用扩容策略），将不再以单链表的形式存储了，会被调整成一颗红黑树。（树化操作的过程是将原本的单链表转化为双向链表，再遍历这个双向链表转化为红黑树）  
+    - 红黑树是解决链表查询出现的O(n)情况,那么为什么不用其他树呢？  
+    如平衡二叉树等,我们通过以下二方面分析：  
+	  平均插入效率：链表>红黑树>平衡二叉树  
+	平均查询效率：平衡二叉树>红黑树>链表  
+可以看出红黑树介于二者之间,hashMap作为各种操作频繁的容器,自然选择综合性能较好的红黑树。  
+    - 为什么阈值是6和8呢？  
+	    1. 为什么8转红黑树?  
+	红黑树的平均查找次数是log2(n)，  
+		长度为8时:  
+			红黑树平均查找次数为3，链表平均查找长度为8/2=4,此时选择红黑树优  
+		长度为4为:  
+			红黑树平均查找次数为2,链表平均长度为4/2=2,此时次数一样,红黑树开销大  
+		至于567我们在这没有讨论的必要  
+	  2. 为什么6转回链表？  
+		若选择7,在7和8链表之间的增删元素,必然会导致频繁进行链表和红黑树的转换  
+2. 节点表示  
+JDK7中的HashMap底层节点叫Entry数组，JDK8中Entry的名字变成了Node，原因是和红黑树的实现TreeNode相关联。  
+3. 数组的角标  
+之前的indexFor()方法消失了，直接用(tab.length-1)&hash，所以看到这个，代表的就是数组的下角标。  
+4. 新节点插入到链表是的插入顺序不同  
+jdk7插入在头部，jdk8插入在尾部。（避免多线程时hashmap在jdk7的环形链表死循环问题）  
+7. 扩容机制不同  
+jdk1.7中resize，只有当 size>=threshold并且 table中的那个槽中已经有Entry时，才会发生resize。  
+1.7扩容时需要重新计算哈希值和索引位置，1.8并不重新计算哈希值，巧妙地采用和扩容后容量进行&操作来计算新的索引位置。  
+6. hash算法不同  
+jdk8的hash函数变简单。jdk8之前之所以hash方法写的比较复杂，主要是为了提高散列行，进而提高遍历速度，但是jdk8以后引入红黑树后大大提高了遍历速度，继续采用复杂的hash算法也就没太大意义，反而还要消耗性能，因为不管是put()还是get()都需要调用hash()。  
+[参考链接](https://yuanrengu.com/2020/ba184259.html)  
+### 16. HashMap和ConcurrentHashMap的区别，HashMap的底层源码  
+
 ### 17. ConcurrentHashMap能完全替代HashTable吗
 ### 18. 为什么HashMap是线程不安全的
 ### 19. 如何线程安全的使用HashMap
