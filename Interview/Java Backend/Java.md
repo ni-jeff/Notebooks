@@ -244,10 +244,22 @@ jdk1.7中resize，只有当 size>=threshold并且 table中的那个槽中已经�
 jdk8的hash函数变简单。jdk8之前之所以hash方法写的比较复杂，主要是为了提高散列行，进而提高遍历速度，但是jdk8以后引入红黑树后大大提高了遍历速度，继续采用复杂的hash算法也就没太大意义，反而还要消耗性能，因为不管是put()还是get()都需要调用hash()。  
 [参考链接](https://yuanrengu.com/2020/ba184259.html)  
 ### 16. HashMap和ConcurrentHashMap的区别，HashMap的底层源码  
-
-### 17. ConcurrentHashMap能完全替代HashTable吗
-### 18. 为什么HashMap是线程不安全的
+对ConcurrentHashMap，  
+1. 底层采用分段的数组+链表实现，线程安全
+2. 通过把整个Map分为N个Segment，可以提供相同的线程安全，但是效率提升N倍，默认提升16倍。(读操作不加锁，由于HashEntry的value变量是 volatile的，也能保证读取到最新的值。)ConcurrentHashMap默认将hash表分为16个桶，诸如get、put、remove等常用操作只锁住当前需要用到的桶。这样，原来只能一个线程进入，现在却能同时有16个写线程执行，并发性能的提升是显而易见的。
+3. Hashtable的synchronized是针对整张Hash表的，即每次锁住整张表让线程独占，ConcurrentHashMap允许多个修改操作并发进行，其关键在于使用了锁分离技术
+4. 有些方法需要跨段，比如size()和containsValue()，它们可能需要锁定整个表而而不仅仅是某个段，这需要按顺序锁定所有段，操作完毕后，又按顺序释放所有段的锁
+5. 扩容：段内扩容（段内元素超过该段对应Entry数组长度的75%触发扩容，不会对整个Map进行扩容），插入前检测需不需要扩容，有效避免无效扩容
+### 17. ConcurrentHashMap能完全替代HashTable吗  
+HashTable虽然性能上不如ConcurrentHashMap，但并不能完全被取代，两者的迭代器的一致性不同的，HashTable的迭代器是强一致性的，而ConcurrentHashMap是弱一致的。 ConcurrentHashMap的get，clear，iterator 都是弱一致性的。  
+- 正是因为get操作几乎所有时候都是一个无锁操作（get中有一个readValueUnderLock调用，不过这句执行到的几率极小），使得同一个Segment实例上的put和get可以同时进行，这就是get操作是弱一致的根本原因。  
+- 因为没有全局的锁，在清除完一个segments之后，正在清理下一个segments的时候，已经清理segments可能又被加入了数据，因此clear返回的时候，ConcurrentHashMap中是可能存在数据的。  
+- 在遍历过程中，如果已经遍历的数组上的内容变化了，迭代器不会抛出ConcurrentModificationException异常。如果未遍历的数组上的内容发生了变化，则有可能反映到迭代过程中。这就是ConcurrentHashMap迭代器弱一致的表现。
+### 18. 为什么HashMap是线程不安全的  
+1. 在JDK1.7中，当并发执行扩容操作时会造成环形链([参考链接](https://blog.csdn.net/swpu_ocean/article/details/88917958?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control&dist_request_id=1cbd1e19-0f4f-4996-b8ac-dd76cfb13cc8&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control))和数据覆盖的情况。  
+2. 在JDK1.8中，在并发执行put操作时会发生数据覆盖的情况。
 ### 19. 如何线程安全的使用HashMap
+
 ### 20. 多并发情况下HashMap是否还会产生死循环
 ### 21. TreeMap、HashMap、LindedHashMap的区别
 ### 22. Collection包结构，与Collections的区别
