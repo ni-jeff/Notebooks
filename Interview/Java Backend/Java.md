@@ -251,18 +251,39 @@ jdk8的hash函数变简单。jdk8之前之所以hash方法写的比较复杂，�
 4. 有些方法需要跨段，比如size()和containsValue()，它们可能需要锁定整个表而而不仅仅是某个段，这需要按顺序锁定所有段，操作完毕后，又按顺序释放所有段的锁
 5. 扩容：段内扩容（段内元素超过该段对应Entry数组长度的75%触发扩容，不会对整个Map进行扩容），插入前检测需不需要扩容，有效避免无效扩容
 ### 17. ConcurrentHashMap能完全替代HashTable吗  
-HashTable虽然性能上不如ConcurrentHashMap，但并不能完全被取代，两者的迭代器的一致性不同的，HashTable的迭代器是强一致性的，而ConcurrentHashMap是弱一致的。 ConcurrentHashMap的get，clear，iterator 都是弱一致性的。  
+HashTable虽然性能上不如ConcurrentHashMap，但并不能完全被取代，两者的迭代器的一致性不同的，HashTable的迭代器是强一致性的，而ConcurrentHashMap是弱一致的。 ConcurrentHashMap的get，clear，iterator 都是弱一致性的。   
+jdk1.7中是分段锁   
 - 正是因为get操作几乎所有时候都是一个无锁操作（get中有一个readValueUnderLock调用，不过这句执行到的几率极小），使得同一个Segment实例上的put和get可以同时进行，这就是get操作是弱一致的根本原因。  
 - 因为没有全局的锁，在清除完一个segments之后，正在清理下一个segments的时候，已经清理segments可能又被加入了数据，因此clear返回的时候，ConcurrentHashMap中是可能存在数据的。  
-- 在遍历过程中，如果已经遍历的数组上的内容变化了，迭代器不会抛出ConcurrentModificationException异常。如果未遍历的数组上的内容发生了变化，则有可能反映到迭代过程中。这就是ConcurrentHashMap迭代器弱一致的表现。
+- 在遍历过程中，如果已经遍历的数组上的内容变化了，迭代器不会抛出ConcurrentModificationException异常。如果未遍历的数组上的内容发生了变化，则有可能反映到迭代过程中。这就是ConcurrentHashMap迭代器弱一致的表现。  
+jdk1.8中优化了（[参考链接](https://baijiahao.baidu.com/s?id=1617089947709260129&wfr=spider&for=pc)）：  
+数据结构：取消了 Segment 分段锁的数据结构，取而代之的是数组+链表+红黑树的结构。  
+保证线程安全机制：JDK1.7 采用 Segment 的分段锁机制实现线程安全，其中 Segment 继承自 ReentrantLock 。JDK1.8 采用CAS+synchronized 保证线程安全。  
+锁的粒度：JDK1.7 是对需要进行数据操作的 Segment 加锁，JDK1.8 调整为对每个数组元素加锁（Node）。  
+链表转化为红黑树：定位节点的 hash 算法简化会带来弊端，hash 冲突加剧，因此在链表节点数量大于 8（且数据总量大于等于 64）时，会将链表转化为红黑树进行存储。   
 ### 18. 为什么HashMap是线程不安全的  
 1. 在JDK1.7中，当并发执行扩容操作时会造成环形链([参考链接](https://blog.csdn.net/swpu_ocean/article/details/88917958?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control&dist_request_id=1cbd1e19-0f4f-4996-b8ac-dd76cfb13cc8&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control))和数据覆盖的情况。  
 2. 在JDK1.8中，在并发执行put操作时会发生数据覆盖的情况。
 ### 19. 如何线程安全的使用HashMap
+1. Hashtable  
+使用 synchronized 来保证线程安全。
+2. ConcurrentHashMap
+3. Collections.synchronizedMap(hashMap)   
+调用 synchronizedMap() 方法后会返回一个 SynchronizedMap 类的对象，而在 SynchronizedMap 类中使用了 synchronized 同步关键字来保证对 Map 的操作是线程安全的。
+### 20. 多并发情况下HashMap是否还会产生死循环  
+jdk1.8中，采用了尾插法更新数据，避免了死循环。但仍存在数据丢失的问题。
+### 21. TreeMap、HashMap、LindedHashMap的区别  
+- Hashmap
+根据键的HashCode 值存储数据，根据键可以直接获取它的值，具有很快的访问速度，遍历时，取得数据的顺序是完全随机的。  
+HashMap最多只允许一条记录的键为Null，不允许多条记录的值为 Null;  
+HashMap不支持线程的同步。
+- LinkedHashMap  
+保存了记录的插入顺序，在用Iterator遍历LinkedHashMap时，先进先出原则。也可以在构造时用带参数，按照应用次数排序。  
+在遍历的时候会比HashMap慢，不过有种情况例外，当HashMap容量很大，实际数据较少时，遍历起来可能会比LinkedHashMap慢，因为LinkedHashMap的遍历速度只和实际数据有关，和容量无关，而HashMap的遍历速度和他的容量有关。  
+- TreeMap  
+实现了SortMap接口，能够把它保存的记录根据键排序，默认是按键值的升序排序，也可以指定排序的比较器。当用Iterator遍历TreeMap时，得到的记录是排过序的。（key必须Key必须实现Comparable接口，或者传入Comparator。比较器通过compare()方法定义。）  
+### 22. Collection包结构，与Collections的区别  
 
-### 20. 多并发情况下HashMap是否还会产生死循环
-### 21. TreeMap、HashMap、LindedHashMap的区别
-### 22. Collection包结构，与Collections的区别
 ### 23. try?catch?finally，try里有return，finally还执行么
 ### 24. Excption与Error包结构，OOM你遇到过哪些情况，SOF你遇到过哪些情况
 ### 25. Java(OOP)面向对象的三个特征与含义
