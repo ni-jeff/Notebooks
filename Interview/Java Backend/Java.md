@@ -285,7 +285,7 @@ HashMap不支持线程的同步。
 ### 22. Collection包结构，与Collections的区别  
 - Collecion包结构  
 List、Set、Queue  
-
+![](https://github.com/ni-jeff/Notebooks/blob/main/Interview/Java%20Backend/Collection_Structure.png)
 - 区别  
 Collection  
   1. Collection是集合类的顶级接口；
