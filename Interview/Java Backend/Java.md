@@ -283,7 +283,21 @@ HashMap不支持线程的同步。
 - TreeMap  
 实现了SortMap接口，能够把它保存的记录根据键排序，默认是按键值的升序排序，也可以指定排序的比较器。当用Iterator遍历TreeMap时，得到的记录是排过序的。（key必须Key必须实现Comparable接口，或者传入Comparator。比较器通过compare()方法定义。）  
 ### 22. Collection包结构，与Collections的区别  
+- Collecion包结构  
+List、Set、Queue  
 
+- 区别  
+Collection  
+  1. Collection是集合类的顶级接口；
+
+  2. 实现接口和类主要有Set、List、LinkedList、ArrayList、Vector、Stack、Set；
+
+  Collections  
+  1. 是针对集合类的一个帮助类，提供操作集合的工具方法；
+
+  2. 一系列静态方法实现对各种集合的搜索、排序、线程安全化等操作；
+
+  3. 服务于Java的Collection的框架；
 ### 23. try?catch?finally，try里有return，finally还执行么
 ### 24. Excption与Error包结构，OOM你遇到过哪些情况，SOF你遇到过哪些情况
 ### 25. Java(OOP)面向对象的三个特征与含义
