@@ -299,11 +299,62 @@ Collection
   2. 一系列静态方法实现对各种集合的搜索、排序、线程安全化等操作；
 
   3. 服务于Java的Collection的框架；
-### 23. try?catch?finally，try里有return，finally还执行么
-### 24. Excption与Error包结构，OOM你遇到过哪些情况，SOF你遇到过哪些情况
-### 25. Java(OOP)面向对象的三个特征与含义
-### 26. Override和Overload的含义去区别
-### 27. Interface与abstract类的区别
+### 23. try-catch-finally，try里有return，finally还执行么  
+finally子句的体要用于清理资源。finally子句是一定会执行的，所以不要将控制流的语句放在里面。若finally中有return语句，会覆盖其他return。  
+try子句里有return时，先把try中将要return的值先存到一个本地变量中，接下来去执行finally语句，最后返回的是存在本地变量中的值。
+### 24. Exception与Error包结构，OOM你遇到过哪些情况，SOF你遇到过哪些情况  
+- 包结构  
+![](https://github.com/ni-jeff/Notebooks/blob/main/Interview/Java%20Backend/throwable_structure.jpg)  
+Throwable是 Java 语言中所有错误或异常的超类。包含两个子类: Error 和 Exception 。  
+  1. Error  
+  Error是程序无法处理的错误，比如OutOfMemoryError、ThreadDeath等。这些异常发生时，Java虚拟机（JVM）一般会选择线程终止。   
+  2. Exception  
+  Exception是程序本身可以处理的异常，这种异常分两大类运行时异常和非运行时异常。 
+  程序中应当尽可能去处理这些异常。  
+    - 运行时异常都是RuntimeException类及其子类异常，如NullPointerException、IndexOutOfBoundsException等， 
+  这些异常是不检查异常，程序中可以选择捕获处理，也可以不处理。这些异常一般是由程序逻辑错误引起的，程序应该从逻辑角度尽可能避免这类异常的发生。 
+    - 非运行时异常是RuntimeException以外的异常，类型上都属于Exception类及其子类。 
+  从程序语法角度讲是必须进行处理的异常，如果不处理，程序就不能编译通过。 
+  如IOException、SQLException等以及用户自定义的Exception异常，一般情况下不自定义检查异常。  
+- OOM(OutOfMemoryError)  
+除了程序计数器外，虚拟机内存的其他几个运行时区域都有发生OutOfMemoryError(OOM)异常的可能。
+  1. Java Heap 溢出：一般的异常信息：java.lang.OutOfMemoryError:Java heap space。  
+java堆用于存储对象实例，我们只要不断的创建对象，并且保证GC Roots到对象之间有可达路径来避免垃圾回收机制清除这些对象，就会在对象数量达到最大堆容量限制后产生内存溢出异常。  
+出现这种异常，一般手段是先通过内存映像分析工具(如Eclipse Memory Analyzer)对dump出来的堆转存快照进行分析，重点是确认内存中的对象是否是必要的，先分清是因为内存泄漏(Memory Leak)还是内存溢出(Memory Overflow)。如果是内存泄漏，可进一步通过工具查看泄漏对象到GCRoots的引用链。于是就能找到泄漏对象是通过怎样的路径与GC Roots相关联并导致垃圾收集器无法自动回收。如果不存在泄漏，那就应该检查虚拟机的参数(-Xmx与-Xms)的设置是否适当。  
+  2. 虚拟机栈和本地方法栈溢出  
+如果线程请求的栈深度大于虚拟机所允许的最大深度，将抛出StackOverflowError异常。如果虚拟机在扩展栈时无法申请到足够的内存空间，则抛出OutOfMemoryError异常。这里需要注意当栈的大小越大可分配的线程数就越少。  
+  3. 运行时常量池溢出：异常信息：java.lang.OutOfMemoryError:PermGenspace。  
+如果要向运行时常量池中添加内容，最简单的做法就是使用String.intern()这个Native方法。该方法的作用是：如果池中已经包含一个等于此String的字符串，则返回代表池中这个字符串的String对象；否则，将此String对象包含的字符串添加到常量池中，并且返回此String对象的引用。由于常量池分配在方法区内，我们可以通过-XX:PermSize和-XX:MaxPermSize限制方法区的大小，从而间接限制其中常量池的容量。  
+  4. 方法区溢出：异常信息：java.lang.OutOfMemoryError:PermGenspace  
+方法区用于存放Class的相关信息，如类名、访问修饰符、常量池、字段描述、方法描述等。也有可能是方法区中保存的class对象没有被及时回收掉或者class信息占用的内存超过了我们配置。  
+方法区溢出也是一种常见的内存溢出异常，一个类如果要被垃圾收集器回收，判定条件是很苛刻的。在经常动态生成大量Class的应用中，要特别注意这点。  
+- SOF(StackOverFlowError)  
+当应用程序递归太深而发生堆栈溢出时，抛出该错误。
+### 25. Java(OOP)面向对象的三个特征与含义  
+封装、继承、多态。  
+- 封装  
+Java中的封装是指一个类把自己内部的实现细节进行隐藏，只暴露对外的接口（setter和getter方法）。封装又分为属性的封装和方法的封装。把属性定义为私有的，它们通过setter和getter方法来对属性的值进行设定和获取。  
+封装的意义就是增强类的信息隐藏与模块化，提高安全性。封装的主要作用也是对外部隐藏具体的实现细节，增加程序的安全性。  
+- 继承  
+Java中的继承是指在一个现有类（父类）的基础上在构建一个新类（子类），子类可以拥有父类的成员变量以及成员方法（但是不一定能访问或调用，例如父类中private私有的成员变量以及方法不能访问和调用）。  
+继承的作用就是能提高代码的复用性。  
+- 多态  
+在Java中，实现多态的方式有两种，一种是编译时的多态，另外一种是运行时多态，编译时的多态是通过方法的重载实现的，而运行时多态是通过方法的重写实现的。  
+  - 方法的重载是指在同一个类中，有多个方法名相同的方法，但是这些方法有着不同的参数列表，在编译期我们就可以确定到底调用哪个方法。  
+  - 方法的重写，子类重写父类中的方法（包括接口的实现），父类的引用不仅可以指向父类的对象，而且还可以指向子类的对象。当父类的引用指向子类的引用时，只有在运行时才能确定调用哪个方法。其实在运行时的多态的实现，需要满足三个条件：1.继承（包括接口的实现）2.方法的重写 3.父类的引用指向子类对象。    
+### 26. Override和Overload的含义和区别  
+- Override 重写  
+1. 方法名、参数、返回值相同。  
+2. 子类方法不能缩小父类方法的访问权限。  
+3. 子类方法不能抛出比父类方法更多的异常(但子类方法可以不抛出异常)。  
+4. 存在于父类和子类之间。  
+5. 方法被定义为final不能被重写。  
+- Overload 重载  
+1. 参数类型、个数、顺序至少有一个不相同。  
+2. 不能重载只有返回值不同的方法名。  
+3. 存在于父类和子类、同类中。
+### 27. Interface与abstract类的区别  
+
 ### 28. Static?class?与non?static?class的区别
 ### 29. java多态的实现原理
 ### 30. foreach与正常for循环效率对比
