@@ -286,7 +286,7 @@ HashMap不支持线程的同步。
 ### 22. Collection包结构，与Collections的区别  
 - Collecion包结构  
 List、Set、Queue  
-![](https://github.com/ni-jeff/Notebooks/blob/main/Interview/Java%20Backend/Collection_Structure.png)
+![](https://github.com/ni-jeff/Notebooks/blob/main/Interview/Java_Backend/Collection_Structure.png)
 - 区别  
 Collection  
   1. Collection是集合类的顶级接口；
@@ -299,12 +299,12 @@ Collection
   2. 一系列静态方法实现对各种集合的搜索、排序、线程安全化等操作；
 
   3. 服务于Java的Collection的框架；
-### 23. try-catch-finally，try里有return，finally还执行么  
+### 23. try{}catch(){}finally{}，try里有return，finally还执行么  
 finally子句的体要用于清理资源。finally子句是一定会执行的，所以不要将控制流的语句放在里面。若finally中有return语句，会覆盖其他return。  
 try子句里有return时，先把try中将要return的值先存到一个本地变量中，接下来去执行finally语句，最后返回的是存在本地变量中的值。
 ### 24. Exception与Error包结构，OOM你遇到过哪些情况，SOF你遇到过哪些情况  
 - 包结构  
-![](https://github.com/ni-jeff/Notebooks/blob/main/Interview/Java%20Backend/throwable_structure.jpg)  
+![](https://github.com/ni-jeff/Notebooks/blob/main/Interview/Java_Backend/throwable_structure.jpg)  
 Throwable是 Java 语言中所有错误或异常的超类。包含两个子类: Error 和 Exception 。  
   1. Error  
   Error是程序无法处理的错误，比如OutOfMemoryError、ThreadDeath等。这些异常发生时，Java虚拟机（JVM）一般会选择线程终止。   
@@ -354,8 +354,18 @@ Java中的继承是指在一个现有类（父类）的基础上在构建一个�
 2. 不能重载只有返回值不同的方法名。  
 3. 存在于父类和子类、同类中。
 ### 27. Interface与abstract类的区别  
+[参考链接1](https://www.cnblogs.com/dolphin0520/p/3811437.html) [参考链接2](https://www.jianshu.com/p/c4f023d02f0c)  
+1. 语法层面上的区别  
+    1. 抽象类可以提供成员方法的实现细节，而接口中只能存在public abstract方法；  
+    2. 抽象类中的成员变量可以是各种类型的，而接口中的成员变量只能是public static final类型的；  
+    3. 抽象类可以有静态代码块和静态方法，而接口中不能含有静态代码块以及静态方法；  
+    4. 一个类只能继承一个抽象类，而一个类却可以实现多个接口。  
+2. 设计层面上的区别  
+    1. 抽象类是对一种事物的抽象，即对类抽象，而接口是对行为的抽象。抽象类是对整个类整体进行抽象，包括属性、行为，但是接口却是对类局部（行为）进行抽象。举个简单的例子，飞机和鸟是不同类的事物，但是它们都有一个共性，就是都会飞。那么在设计的时候，可以将飞机设计为一个类Airplane，将鸟设计为一个类Bird，但是不能将飞行这个特性也设计为类，因此它只是一个行为特性，并不是对一类事物的抽象描述。此时可以将飞行设计为一个接口Fly，包含方法fly( )，然后Airplane和Bird分别根据自己的需要实现Fly这个接口。从这里可以看出，继承是一个"是不是"的关系，而接口实现则是"有没有"的关系。如果一个类继承了某个抽象类，则子类必定是抽象类的种类，而接口实现则是有没有、具备不具备的关系，比如鸟是否能飞（或者是否具备飞行这个特点），能飞行则可以实现这个接口，不能飞行就不实现这个接口。  
+    2. 设计层面不同，抽象类作为很多子类的父类，它是一种模板式设计。而接口是一种行为规范，它是一种辐射式设计。对于抽象类，如果需要添加新的方法，可以直接在抽象类中添加具体的实现，子类可以不进行变更；而对于接口则不行，如果接口进行了变更，则所有实现这个接口的类都必须进行相应的改动。  
+![](https://github.com/ni-jeff/Notebooks/blob/main/Interview/Java_Backend/abstract-interface.png)
+### 28. Static class 与non static class的区别
 
-### 28. Static?class?与non?static?class的区别
 ### 29. java多态的实现原理
 ### 30. foreach与正常for循环效率对比
 ### 31. Java?IO与NIO
