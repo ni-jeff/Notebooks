@@ -395,8 +395,16 @@ ArrayList用for循环随机读取的速度是很快的，因为ArrayList的下�
   3. 平行迭代：如果需要并行地遍历多个集合，就需要显式的控制迭代器或者索引变量，以便所有迭代器或者索引变量都可以得到同步前移。  
 ### 31. Java IO与NIO  
 
-### 32. java反射的作用与原理
-### 33. 泛型常用特点
+### 32. java反射的作用与原理  
+[参考链接](https://blog.csdn.net/sinat_38259539/article/details/71799078?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control&dist_request_id=f8a633fd-94bc-441e-a111-bafd33f52ac4&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control)  
+- 定义  
+JAVA反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意一个方法和属性；这种动态获取的信息以及动态调用对象的方法的功能称为java语言的反射机制。  
+- 作用  
+在运行时，仅知道类名，通过Class对象反向获得Java对象的方法和属性，可以**动态**的创建对象和编译。  
+- 原理  
+类的.class文件读入内存时会同时产生一个class对象，又jvm自动创建。通过这个对象即可反向获取类或者对象的各种信息。  
+### 33. 泛型常用特点  
+
 ### 34. 解析XML的几种方式的原理与特点：DOM、SAX
 ### 35. Java1.7与1.8,1.9,10 新特性
 ### 36. 设计模式：单例、工厂、适配器、责任链、观察者等等
