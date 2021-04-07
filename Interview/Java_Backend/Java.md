@@ -11,7 +11,7 @@
 |float|4|Float|0.0f|  
 |double|8|Double|0.0d|  
 |boolean|1|boolean|false|  
-- 默认值使用条件：当变量作为作为类成员使用时，java才给定初始值，防止程序运行时错误。([参考链接](https://blog.csdn.net/lxxlxx888/article/details/62228621/))
+- 默认值使用条件：当变量作为作为类成员使用时，java才给定初始值，防止程序运行时错误。([Reference](https://blog.csdn.net/lxxlxx888/article/details/62228621/))
 - [int和Integer的区别](https://www.cnblogs.com/guodongdidi/p/6953217.html)：  
     1. Integer是int的包装类，int则是java的一种基本数据类型  
     2. Integer变量必须实例化后才能使用，而int变量不需要  
@@ -213,7 +213,7 @@ Hashtable的初始长度是11，之后每次扩充容量变为之前的2n+1（n�
 6. 添加元素时计算哈希值的方法不同  
 Hashtable直接使用对象的hashCode。  
 HashMap使用的是key的hashcode 高低16位异或的结果。效率更高。  
-[参考链接](https://www.cnblogs.com/javabg/p/7258550.html)
+[Reference](https://www.cnblogs.com/javabg/p/7258550.html)
 ### 15. JDK7与JDK8中HashMap的实现  
 1. 结构  
 JDK7中HashMap采用的是位桶+链表的方式，即我们常说的散列链表的方式，而JDK8中采用的是位桶+链表/红黑树。JDK8中，当同一个hash值的节点数不小于8时（且数组长度必须大于等于MIN_TREEIFY_CAPACITY（64），否则继续采用扩容策略），将不再以单链表的形式存储了，会被调整成一颗红黑树。（树化操作的过程是将原本的单链表转化为双向链表，再遍历这个双向链表转化为红黑树）  
@@ -243,7 +243,7 @@ jdk1.7中resize，只有当 size>=threshold并且 table中的那个槽中已经�
 1.7扩容时需要重新计算哈希值和索引位置，1.8并不重新计算哈希值，巧妙地采用和扩容后容量进行&操作来计算新的索引位置。  
 6. hash算法不同  
 jdk8的hash函数变简单。jdk8之前之所以hash方法写的比较复杂，主要是为了提高散列行，进而提高遍历速度，但是jdk8以后引入红黑树后大大提高了遍历速度，继续采用复杂的hash算法也就没太大意义，反而还要消耗性能，因为不管是put()还是get()都需要调用hash()。  
-[参考链接](https://yuanrengu.com/2020/ba184259.html)  
+[Reference](https://yuanrengu.com/2020/ba184259.html)  
 ### 16. HashMap和ConcurrentHashMap的区别，HashMap的底层源码  
 对ConcurrentHashMap，  
 1. 底层采用分段的数组+链表实现，线程安全
@@ -257,13 +257,13 @@ jdk1.7中是分段锁
 - 正是因为get操作几乎所有时候都是一个无锁操作（get中有一个readValueUnderLock调用，不过这句执行到的几率极小），使得同一个Segment实例上的put和get可以同时进行，这就是get操作是弱一致的根本原因。  
 - 因为没有全局的锁，在清除完一个segments之后，正在清理下一个segments的时候，已经清理segments可能又被加入了数据，因此clear返回的时候，ConcurrentHashMap中是可能存在数据的。  
 - 在遍历过程中，如果已经遍历的数组上的内容变化了，迭代器不会抛出ConcurrentModificationException异常。如果未遍历的数组上的内容发生了变化，则有可能反映到迭代过程中。这就是ConcurrentHashMap迭代器弱一致的表现。  
-jdk1.8中优化了（[参考链接](https://baijiahao.baidu.com/s?id=1617089947709260129&wfr=spider&for=pc)）：  
+jdk1.8中优化了（[Reference](https://baijiahao.baidu.com/s?id=1617089947709260129&wfr=spider&for=pc)）：  
 数据结构：取消了 Segment 分段锁的数据结构，取而代之的是数组+链表+红黑树的结构。  
 保证线程安全机制：JDK1.7 采用 Segment 的分段锁机制实现线程安全，其中 Segment 继承自 ReentrantLock 。JDK1.8 采用CAS+synchronized 保证线程安全。  
 锁的粒度：JDK1.7 是对需要进行数据操作的 Segment 加锁，JDK1.8 调整为对每个数组元素加锁（Node）。  
 链表转化为红黑树：定位节点的 hash 算法简化会带来弊端，hash 冲突加剧，因此在链表节点数量大于 8（且数据总量大于等于 64）时，会将链表转化为红黑树进行存储。   
 ### 18. 为什么HashMap是线程不安全的  
-1. 在JDK1.7中，当并发执行扩容操作时会造成环形链([参考链接](https://blog.csdn.net/swpu_ocean/article/details/88917958?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control&dist_request_id=1cbd1e19-0f4f-4996-b8ac-dd76cfb13cc8&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control))和数据覆盖的情况。  
+1. 在JDK1.7中，当并发执行扩容操作时会造成环形链([Reference](https://blog.csdn.net/swpu_ocean/article/details/88917958?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control&dist_request_id=1cbd1e19-0f4f-4996-b8ac-dd76cfb13cc8&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control))和数据覆盖的情况。  
 2. 在JDK1.8中，在并发执行put操作时会发生数据覆盖的情况。
 ### 19. 如何线程安全的使用HashMap
 1. Hashtable  
@@ -354,7 +354,7 @@ Java中的继承是指在一个现有类（父类）的基础上在构建一个�
 2. 不能重载只有返回值不同的方法名。  
 3. 存在于父类和子类、同类中。
 ### 27. Interface与abstract类的区别  
-[参考链接1](https://www.cnblogs.com/dolphin0520/p/3811437.html) [参考链接2](https://www.jianshu.com/p/c4f023d02f0c)  
+[Reference1](https://www.cnblogs.com/dolphin0520/p/3811437.html) [Reference2](https://www.jianshu.com/p/c4f023d02f0c)  
 1. 语法层面上的区别  
     1. 抽象类可以提供成员方法的实现细节，而接口中只能存在public abstract方法；  
     2. 抽象类中的成员变量可以是各种类型的，而接口中的成员变量只能是public static final类型的；  
@@ -370,7 +370,7 @@ Java中的继承是指在一个现有类（父类）的基础上在构建一个�
 2. 非静态内部类能够访问外部类的静态和非静态成员。静态类不能访问外部类的非静态成员。他只能访问外部类的静态成员
 3. 一个非静态内部类不能脱离外部类实体被创建，一个非静态内部类可以访问外部类的数据和方法，因为他就在外部类里面
 ### 29. java多态的实现原理  
-[参考链接](https://www.cnblogs.com/kaleidoscope/p/9790766.html)  
+[Reference](https://www.cnblogs.com/kaleidoscope/p/9790766.html)  
 1. 方法表与方法调用  
     - 方法区  
     在JVM执行Java字节码时，类型信息被存放在方法区中，通常为了优化对象调用方法的速度，方法区的类型信息中增加一个指针，该指针指向一张记录该类方法入口的表（称为方法表），表中的每一项都是指向相应方法的指针。  
@@ -394,12 +394,12 @@ ArrayList用for循环随机读取的速度是很快的，因为ArrayList的下�
   2. 转换：如果需要遍历列表或数组，并取代它部分或者全部的元素值，就需要列表迭代器ListIterator或者数组索引，以便设定元素的值。（如果直接更改它引用对象的值的话，也可以使用Iterator，前提是符合按引用传递的原则，Iterator的元素为基本数据类型就不会按引用传递，或者它们的包装类，因为是不可变类，也不符合要求。）  
   3. 平行迭代：如果需要并行地遍历多个集合，就需要显式的控制迭代器或者索引变量，以便所有迭代器或者索引变量都可以得到同步前移。  
 ### 31. Java IO与NIO  
-[参考链接](https://www.cnblogs.com/aspirant/p/8630283.html)  
+[Reference](https://www.cnblogs.com/aspirant/p/8630283.html)  
 - 区别
   1. 面向流与面向缓冲  
   2. 阻塞与非阻塞  
 ### 32. java反射的作用与原理  
-[参考链接](https://blog.csdn.net/sinat_38259539/article/details/71799078?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control&dist_request_id=f8a633fd-94bc-441e-a111-bafd33f52ac4&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control)  
+[Reference](https://blog.csdn.net/sinat_38259539/article/details/71799078?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control&dist_request_id=f8a633fd-94bc-441e-a111-bafd33f52ac4&depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-1.control)  
 - 定义  
 JAVA反射机制是在运行状态中，对于任意一个类，都能够知道这个类的所有属性和方法；对于任意一个对象，都能够调用它的任意一个方法和属性；这种动态获取的信息以及动态调用对象的方法的功能称为java语言的反射机制。  
 - 作用  
@@ -407,7 +407,7 @@ JAVA反射机制是在运行状态中，对于任意一个类，都能够知道�
 - 原理  
 类的.class文件读入内存时会同时产生一个class对象，又jvm自动创建。通过这个对象即可反向获取类或者对象的各种信息。  
 ### 33. 泛型常用特点  
-[参考链接1](https://www.cnblogs.com/coprince/p/8603492.html) [参考链接2](https://www.cnblogs.com/wuqinglong/p/9456193.html)  
+[Reference1](https://www.cnblogs.com/coprince/p/8603492.html) [Reference2](https://www.cnblogs.com/wuqinglong/p/9456193.html)  
 - 定义  
 泛型的本质是为了参数化类型（在不创建新的类型的情况下，通过泛型指定的不同类型来控制形参具体限制的类型）。也就是说在泛型使用过程中，操作的数据类型被指定为一个参数，这种参数类型可以用在类、接口和方法中，分别被称为泛型类、泛型接口、泛型方法。  
 - 优点  
@@ -447,7 +447,7 @@ Java的泛型是伪泛型，这是因为Java在编译期间，所有的泛型信
     ```
 
 ### 34. 解析XML的几种方式的原理与特点：DOM、SAX  
-[参考链接](https://www.cnblogs.com/longqingyang/p/5577937.html)  
+[Reference](https://www.cnblogs.com/longqingyang/p/5577937.html)  
 - DOM (Document Object Model) - 文档对象模型  
 在应用程序中，基于DOM的XML分析器将一个XML文档转换成一个对象模型的集合（通常称DOM树），应用程序正是通过对这个对象模型的操作，来实现对XML文档数据的操作。通过DOM接口，应用程序可以在任何时候访问XML文档中的任何一部分数据，因此，这种利用DOM接口的机制也被称作随机访问机制。  
 DOM接口提供了一种通过分层对象模型来访问XML文档信息的方式，这些分层对象模型依据XML的文档结构形成了一棵节点树。  
@@ -467,7 +467,7 @@ SAX提供的访问模式是一种顺序模式，能快速读写XML。当使用SA
     1. 编码比较麻烦。  
     2. 很难同时访问XML文件中的多处不同数据。  
 ### 35. Java1.7与1.8,1.9,10 新特性  
-[参考链接](https://blog.csdn.net/qq_33204709/article/details/78948650#)  
+[Reference](https://blog.csdn.net/qq_33204709/article/details/78948650#)  
 
 ### 36. 设计模式：单例、工厂、适配器、责任链、观察者等等
 ### 37. JNI的使用  

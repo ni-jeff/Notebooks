@@ -35,7 +35,7 @@
 - from后面的表关联，是自右向左解析 而where条件的解析顺序是自下而上的。  
   也就是说，在写SQL语句的时候，尽量把数据量小的表放在最右边来进行关联（用小表去匹配大表），而把能筛选出小量数据的条件放在where语句的最左边 （用小表去匹配大表）
 ### 6. 数据库的优化（从sql语句优化和索引两个部分回答）
-[参考链接](https://tech.meituan.com/2014/06/30/mysql-index.html)  
+[Reference](https://tech.meituan.com/2014/06/30/mysql-index.html)  
 1. 索引优化
     1. 建立聚集索引
     2. 常查询数据建立索引
@@ -171,7 +171,7 @@ MySQL语法：左表 join 右表 on 匹配条件
 3. 交叉连接/笛卡尔积（cross join）：显示两张表所有记录的一一对应，没有匹配关系进行筛选。  
 MySQL语法：左表 join 右表 或 左表,右表
 ### 18. 死锁判定原理和具体场景，死锁怎么解决  
-[参考链接](https://blog.csdn.net/XiaHeShun/article/details/81393796)  
+[Reference](https://blog.csdn.net/XiaHeShun/article/details/81393796)  
 - 锁的种类
   | 锁种类 | 开销           | 死锁 | 颗粒度 | 锁冲突   | 并发度 |
   | :----- | :------------- | :--- | :----- | :------- | :----- |
